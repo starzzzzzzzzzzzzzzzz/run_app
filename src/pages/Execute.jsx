@@ -128,8 +128,16 @@ export default function Execute() {
         touchZoom: false,
       }).setView([-14.235, -51.925], 15)
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        maxZoom: 19,
+      // Google Satellite tiles
+      L.tileLayer('https://mt{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['0','1','2','3'],
+      }).addTo(leafletMap.current)
+      // Hybrid label overlay (ruas/nomes em cima do satélite)
+      L.tileLayer('https://mt{s}.google.com/vt/lyrs=h&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['0','1','2','3'],
+        opacity: 0.7,
       }).addTo(leafletMap.current)
 
       setMapReady(true)
@@ -171,52 +179,138 @@ export default function Execute() {
 
   const captureRoute = useCallback(() => {
     return new Promise((resolve) => {
-      if (!leafletMap.current || coordsRef.current.length < 2) {
-        resolve(null)
-        return
-      }
-      // Use a canvas-based static map snapshot
+      const coords   = coordsRef.current
+      const dist     = distKmRef.current
+      const elapsed  = totalSecRef.current
+      const paceVal  = dist > 0.05 ? (elapsed / 60) / dist : null
+
+      // Portrait 9:16 card (stories format)
+      const W = 540, H = 960
+      const ROUTE_H = 340
+      const MID_H   = 460
+      const BOT_H   = 160
+
       const canvas = document.createElement('canvas')
-      canvas.width = 360; canvas.height = 220
+      canvas.width = W; canvas.height = H
       const ctx = canvas.getContext('2d')
-      ctx.fillStyle = '#111'
-      ctx.fillRect(0, 0, 360, 220)
 
-      const lats = coordsRef.current.map(c => c[0])
-      const lngs = coordsRef.current.map(c => c[1])
-      const minLat = Math.min(...lats), maxLat = Math.max(...lats)
-      const minLng = Math.min(...lngs), maxLng = Math.max(...lngs)
-      const pad = 0.0003
+      const drawBranding = () => {
+        ctx.fillStyle = '#0a0a0a'
+        ctx.fillRect(0, ROUTE_H + MID_H, W, BOT_H)
+        ctx.fillStyle = '#00e676'
+        ctx.fillRect(0, ROUTE_H + MID_H, W, 3)
+        ctx.textAlign = 'center'
+        ctx.font = 'bold 38px Arial'
+        ctx.fillStyle = '#ffffff'
+        ctx.fillText('PaceUp', W / 2, ROUTE_H + MID_H + 74)
+        ctx.font = '15px Arial'
+        ctx.fillStyle = 'rgba(255,255,255,0.3)'
+        ctx.fillText('seu ritmo. sua corrida.', W / 2, ROUTE_H + MID_H + 104)
+        const dateStr = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
+        ctx.font = '13px Arial'
+        ctx.fillStyle = 'rgba(0,230,118,0.8)'
+        ctx.fillText(dateStr, W / 2, ROUTE_H + MID_H + 134)
+        resolve(canvas.toDataURL('image/png'))
+      }
 
-      const toX = (lng) => ((lng - minLng + pad) / (maxLng - minLng + pad * 2)) * 340 + 10
-      const toY = (lat) => (1 - (lat - minLat + pad) / (maxLat - minLat + pad * 2)) * 200 + 10
+      const drawStats = () => {
+        ctx.fillStyle = '#0a0a0a'
+        ctx.fillRect(0, ROUTE_H, W, MID_H)
+        ctx.textAlign = 'center'
+        ctx.font = 'bold 18px Arial'
+        ctx.fillStyle = 'rgba(255,255,255,0.3)'
+        ctx.letterSpacing = '6px'
+        ctx.fillText('RUNNING', W / 2, ROUTE_H + 44)
+        ctx.letterSpacing = '0px'
+        ctx.fillStyle = 'rgba(255,255,255,0.07)'
+        ctx.fillRect(40, ROUTE_H + 56, W - 80, 1)
 
-      ctx.beginPath()
-      ctx.strokeStyle = '#00e676'
-      ctx.lineWidth = 3
-      ctx.lineCap = 'round'
-      ctx.lineJoin = 'round'
-      coordsRef.current.forEach(([lat, lng], i) => {
-        const x = toX(lng), y = toY(lat)
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
-      })
-      ctx.stroke()
+        const pm = paceVal ? Math.floor(paceVal) : 0
+        const ps = paceVal ? String(Math.round((paceVal % 1) * 60)).padStart(2,'0') : '00'
+        const statsData = [
+          { value: dist > 0 ? dist.toFixed(2) : '0.00', unit: 'km',     label: 'Distância', y: ROUTE_H + 150 },
+          { value: fmtTime(elapsed),                      unit: '',       label: 'Duração',   y: ROUTE_H + 270 },
+          { value: paceVal ? `${pm}:${ps}` : '--:--',    unit: 'min/km', label: 'Pace médio',y: ROUTE_H + 390 },
+        ]
 
-      // start dot
-      const [startLat, startLng] = coordsRef.current[0]
-      ctx.beginPath()
-      ctx.arc(toX(startLng), toY(startLat), 5, 0, Math.PI * 2)
-      ctx.fillStyle = '#fff'
-      ctx.fill()
+        statsData.forEach(({ value, unit, label, y }) => {
+          ctx.textAlign = 'center'
+          ctx.font = 'bold 78px Arial'
+          ctx.fillStyle = '#ffffff'
+          const vw = ctx.measureText(value).width
+          ctx.textAlign = 'left'
+          let startX = W / 2 - vw / 2
+          if (unit) startX -= 18
+          ctx.fillText(value, startX, y)
+          if (unit) {
+            ctx.font = 'bold 20px Arial'
+            ctx.fillStyle = 'rgba(255,255,255,0.45)'
+            ctx.fillText(unit, startX + vw + 6, y - 42)
+          }
+          ctx.font = '15px Arial'
+          ctx.fillStyle = 'rgba(255,255,255,0.35)'
+          ctx.textAlign = 'center'
+          ctx.fillText(label, W / 2, y + 30)
+          ctx.fillStyle = 'rgba(255,255,255,0.06)'
+          ctx.fillRect(40, y + 48, W - 80, 1)
+        })
 
-      // end dot
-      const [endLat, endLng] = coordsRef.current[coordsRef.current.length - 1]
-      ctx.beginPath()
-      ctx.arc(toX(endLng), toY(endLat), 6, 0, Math.PI * 2)
-      ctx.fillStyle = '#00e676'
-      ctx.fill()
+        drawBranding()
+      }
 
-      resolve(canvas.toDataURL('image/png'))
+      const drawRoute = () => {
+        ctx.fillStyle = '#0d0d0d'
+        ctx.fillRect(0, 0, W, ROUTE_H)
+
+        if (coords.length >= 2) {
+          const lats = coords.map(c => c[0])
+          const lngs = coords.map(c => c[1])
+          const minLat = Math.min(...lats), maxLat = Math.max(...lats)
+          const minLng = Math.min(...lngs), maxLng = Math.max(...lngs)
+          const dLat = (maxLat - minLat) || 0.001
+          const dLng = (maxLng - minLng) || 0.001
+          const pad  = 0.25
+          const bMinLat = minLat - dLat * pad, bMaxLat = maxLat + dLat * pad
+          const bMinLng = minLng - dLng * pad, bMaxLng = maxLng + dLng * pad
+          const margin = 44
+          const toX = (lng) => margin + ((lng - bMinLng) / (bMaxLng - bMinLng)) * (W - margin * 2)
+          const toY = (lat) => (ROUTE_H - margin) - ((lat - bMinLat) / (bMaxLat - bMinLat)) * (ROUTE_H - margin * 2)
+
+          // Glow halo
+          ctx.beginPath()
+          ctx.strokeStyle = 'rgba(0,230,118,0.25)'
+          ctx.lineWidth = 14
+          ctx.lineCap = 'round'; ctx.lineJoin = 'round'
+          coords.forEach(([lat, lng], i) => i === 0 ? ctx.moveTo(toX(lng), toY(lat)) : ctx.lineTo(toX(lng), toY(lat)))
+          ctx.stroke()
+
+          // White route
+          ctx.beginPath()
+          ctx.strokeStyle = '#ffffff'
+          ctx.lineWidth = 4
+          coords.forEach(([lat, lng], i) => i === 0 ? ctx.moveTo(toX(lng), toY(lat)) : ctx.lineTo(toX(lng), toY(lat)))
+          ctx.stroke()
+
+          // Start dot
+          const [sLat, sLng] = coords[0]
+          ctx.beginPath()
+          ctx.arc(toX(sLng), toY(sLat), 7, 0, Math.PI * 2)
+          ctx.fillStyle = '#ffffff'
+          ctx.fill()
+
+          // End dot green
+          const [eLat, eLng] = coords[coords.length - 1]
+          ctx.shadowColor = '#00e676'; ctx.shadowBlur = 18
+          ctx.beginPath()
+          ctx.arc(toX(eLng), toY(eLat), 10, 0, Math.PI * 2)
+          ctx.fillStyle = '#00e676'
+          ctx.fill()
+          ctx.shadowBlur = 0
+        }
+        drawStats()
+      }
+
+      drawRoute()
     })
   }, [])
 
