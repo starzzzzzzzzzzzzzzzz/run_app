@@ -1,74 +1,18 @@
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --bg: #0a0a0a;
-  --bg2: #141414;
-  --bg3: #1e1e1e;
-  --border: rgba(255,255,255,0.08);
-  --border2: rgba(255,255,255,0.14);
-  --green: #00e676;
-  --green-dim: rgba(0,230,118,0.12);
-  --green-mid: rgba(0,230,118,0.25);
-  --blue: #4fc3f7;
-  --blue-dim: rgba(79,195,247,0.12);
-  --text: #f0f0f0;
-  --text2: rgba(240,240,240,0.5);
-  --text3: rgba(240,240,240,0.25);
-  --red: #ff5252;
-  --amber: #ffab40;
-  --font-display: 'Syne', sans-serif;
-  --font-mono: 'DM Mono', monospace;
-  --font-body: 'Inter', sans-serif;
-  --radius: 14px;
-  --radius-sm: 8px;
-}
-
-html, body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-body);
-  font-size: 16px;
-  line-height: 1.5;
-  min-height: 100dvh;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-}
-
-#root {
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-}
-
-button { cursor: pointer; font-family: inherit; }
-input { font-family: inherit; }
-
-::-webkit-scrollbar { width: 0; }
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-@keyframes slideRight {
-  from { transform: translateX(-100%); }
-  to   { transform: translateX(0); }
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-@keyframes growBar {
-  from { transform: scaleX(0); }
-  to   { transform: scaleX(1); }
-}
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+*{box-sizing:border-box}body{margin:0;background:#071018;color:#fff;font-family:Inter,sans-serif}
+a{text-decoration:none}
+.screen{padding:22px;padding-bottom:120px;min-height:100vh;background:linear-gradient(180deg,#071018,#0e1725)}
+.hero,.big-card,.card,.history-card,.map-card,.share-card{background:rgba(20,30,45,.9);border:1px solid rgba(255,255,255,.05);border-radius:28px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.hero{padding:30px;display:flex;flex-direction:column;gap:20px}
+h1{font-size:42px;line-height:1;margin:0}.subtitle,.muted{color:#93a4bd}.primary-btn,.secondary-btn{border:none;border-radius:18px;padding:16px 20px;font-weight:700}
+.primary-btn{background:#66ff9a;color:#04110a}.secondary-btn{background:#1b2a3d;color:#fff}
+.stats-grid,.run-stats{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}.card{padding:20px}.card h2{margin:10px 0 0}
+.big-card{padding:20px;margin-top:20px}.route-preview,.history-map,.share-preview{height:160px;border-radius:22px;background:linear-gradient(135deg,#122033,#0d1522);position:relative;overflow:hidden}
+.route-preview:before,.history-map:before,.share-preview:before{content:'';position:absolute;width:180px;height:180px;border:6px solid #66ff9a;border-radius:40%;left:20px;top:20px;opacity:.6}
+.bottom-nav{position:fixed;bottom:18px;left:18px;right:18px;background:rgba(14,23,37,.95);display:flex;justify-content:space-around;padding:18px;border-radius:24px;backdrop-filter:blur(20px)}
+.bottom-nav a{color:#8ea1bc;font-weight:700}.bottom-nav .active{color:#66ff9a}
+.map-card{height:420px;position:relative;padding:10px;overflow:hidden}.fake-map{width:100%;height:100%;background:#0a1320;border-radius:24px}.fake-map path{fill:none;stroke:#66ff9a;stroke-width:2.5;stroke-linecap:round}
+.map-toolbar{position:absolute;right:20px;top:20px;display:flex;flex-direction:column;gap:10px;z-index:10}.map-toolbar button{width:42px;height:42px;border:none;border-radius:14px;background:#132134;color:#fff}
+.history-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.history-header input{background:#132134;border:none;padding:14px;border-radius:14px;color:#fff}
+.history-card{display:flex;gap:16px;padding:14px;margin-bottom:16px}.history-map{width:120px;height:120px;flex-shrink:0}
+.share-modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:20px}.share-card{width:100%;max-width:380px;padding:22px}.share-actions{display:flex;gap:10px;margin-top:18px}
