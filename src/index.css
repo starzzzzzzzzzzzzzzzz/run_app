@@ -1,52 +1,50 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:        #0C0C0E;
-  --bg2:       #141416;
-  --bg3:       #1C1C1F;
-  --bg4:       #242428;
-  --border:    rgba(255,255,255,0.06);
-  --border2:   rgba(255,255,255,0.12);
-  --green:     #C8F04A;
-  --green-dim: rgba(200,240,74,0.08);
-  --green-mid: rgba(200,240,74,0.18);
-  --blue:      #5BC4F5;
-  --blue-dim:  rgba(91,196,245,0.08);
-  --red:       #FF5050;
-  --amber:     #FFB84D;
-  --text:      #EFEFEF;
-  --text2:     rgba(239,239,239,0.45);
-  --text3:     rgba(239,239,239,0.20);
-  --font-display: 'Space Grotesk', sans-serif;
-  --font-mono:    'JetBrains Mono', monospace;
-  --radius:    18px;
-  --radius-sm: 11px;
-  --shadow: 0 2px 20px rgba(0,0,0,0.4);
+  --bg:      #080808;
+  --bg2:     #111111;
+  --bg3:     #1a1a1a;
+  --bg4:     #222222;
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --green:   #b5f23d;
+  --green2:  #8ecc22;
+  --green-dim: rgba(181,242,61,0.10);
+  --green-mid: rgba(181,242,61,0.22);
+  --blue:    #5bc4f5;
+  --blue-dim:rgba(91,196,245,0.10);
+  --red:     #ff5c5c;
+  --amber:   #ffb340;
+  --purple:  #b97fff;
+  --text:    #f2f2f2;
+  --text2:   rgba(242,242,242,0.48);
+  --text3:   rgba(242,242,242,0.22);
+  --radius:  16px;
+  --radius-sm: 10px;
+  --font-display: 'Syne', sans-serif;
+  --font-mono:    'DM Mono', monospace;
+  --font-body:    'Inter', sans-serif;
 }
 
 html, body {
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.5;
   min-height: 100dvh;
-  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
-
 #root { min-height: 100dvh; display: flex; flex-direction: column; }
-button { cursor: pointer; font-family: inherit; }
-input  { font-family: inherit; }
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+button { cursor: pointer; font-family: inherit; border: none; background: none; }
+input, select, textarea { font-family: inherit; }
 ::-webkit-scrollbar { width: 0; }
 
-@keyframes fadeUp  { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-@keyframes fadeIn  { from{opacity:0} to{opacity:1} }
-@keyframes spin    { to{transform:rotate(360deg)} }
-@keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:.25} }
-@keyframes scaleIn { from{transform:scale(0.94);opacity:0} to{transform:scale(1);opacity:1} }
-@keyframes slideUp { from{transform:translateY(100%);opacity:0} to{transform:translateY(0);opacity:1} }
-@keyframes ripple  { from{transform:scale(1);opacity:0.6} to{transform:scale(2.4);opacity:0} }
+@keyframes fadeUp   { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeIn   { from { opacity:0; } to { opacity:1; } }
+@keyframes slideUp  { from { transform:translateY(100%); } to { transform:translateY(0); } }
+@keyframes spin     { to { transform:rotate(360deg); } }
+@keyframes pulse    { 0%,100%{opacity:1} 50%{opacity:.25} }
+@keyframes shimmer  { from{background-position:-200% 0} to{background-position:200% 0} }
+@keyframes growBar  { from{transform:scaleX(0)} to{transform:scaleX(1)} }

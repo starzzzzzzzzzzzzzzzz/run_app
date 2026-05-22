@@ -2,24 +2,22 @@ import React from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 
 const ITEMS = [
-  { path: '/',        label: 'Início',    icon: HomeIcon },
-  { path: '/plan',    label: 'Treino',    icon: PlayIcon },
-  { path: '/history', label: 'Histórico', icon: HistoryIcon },
+  { path:'/',        label:'Início',    icon:(a)=>(<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 12L12 3l9 9M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9" stroke={a?'var(--green)':'rgba(255,255,255,0.28)'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>) },
+  { path:'/plan',    label:'Treino',    icon:(a)=>(<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke={a?'var(--green)':'rgba(255,255,255,0.28)'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>) },
+  { path:'/history', label:'Histórico', icon:(a)=>(<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke={a?'var(--green)':'rgba(255,255,255,0.28)'} strokeWidth="1.8" strokeLinecap="round"/></svg>) },
+  { path:'/profile', label:'Perfil',    icon:(a)=>(<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z" stroke={a?'var(--green)':'rgba(255,255,255,0.28)'} strokeWidth="1.8" strokeLinecap="round"/></svg>) },
 ]
 
 export default function BottomNav() {
-  const nav = useNavigate()
-  const loc = useLocation()
+  const nav=useNavigate(), loc=useLocation()
   return (
-    <nav style={s.nav}>
-      {ITEMS.map(({ path, label, icon: Icon }) => {
-        const active = loc.pathname === path
+    <nav style={st.nav}>
+      {ITEMS.map(item=>{
+        const active=loc.pathname===item.path
         return (
-          <button key={path} style={s.item} onClick={() => nav(path)}>
-            <div style={{ ...s.iconWrap, background: active ? 'var(--green)' : 'transparent' }}>
-              <Icon color={active ? '#000' : 'rgba(245,245,245,0.35)'} />
-            </div>
-            <span style={{ ...s.label, color: active ? 'var(--green)' : 'var(--text3)' }}>{label}</span>
+          <button key={item.path} style={st.item} onClick={()=>nav(item.path)}>
+            {item.icon(active)}
+            <span style={{...st.lbl, color:active?'var(--green)':'rgba(255,255,255,0.28)'}}>{item.label}</span>
           </button>
         )
       })}
@@ -27,42 +25,8 @@ export default function BottomNav() {
   )
 }
 
-function HomeIcon({ color }) {
-  return <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z" stroke={color} strokeWidth="2" strokeLinejoin="round"/>
-    <path d="M9 21V12h6v9" stroke={color} strokeWidth="2" strokeLinejoin="round"/>
-  </svg>
-}
-function PlayIcon({ color }) {
-  return <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <circle cx="12" cy="12" r="9" stroke={color} strokeWidth="2"/>
-    <path d="M10 8.5l5 3.5-5 3.5V8.5z" fill={color}/>
-  </svg>
-}
-function HistoryIcon({ color }) {
-  return <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <path d="M12 8v4l3 3" stroke={color} strokeWidth="2" strokeLinecap="round"/>
-    <path d="M3.05 11a9 9 0 1 0 .5-3M3 5v3h3" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-}
-
-const s = {
-  nav: {
-    position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100,
-    background: 'rgba(8,8,8,0.92)', backdropFilter: 'blur(20px)',
-    borderTop: '1px solid var(--border)',
-    display: 'flex', justifyContent: 'space-around',
-    padding: '10px 0 max(16px, env(safe-area-inset-bottom))',
-  },
-  item: {
-    background: 'none', border: 'none',
-    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px',
-    padding: '2px 24px',
-  },
-  iconWrap: {
-    width: '40px', height: '40px', borderRadius: '12px',
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    transition: 'all 0.2s',
-  },
-  label: { fontSize: '10px', fontFamily: 'var(--font-mono)', letterSpacing: '0.3px', transition: 'color 0.2s' },
+const st = {
+  nav:{ position:'fixed',bottom:0,left:0,right:0,background:'rgba(8,8,8,0.96)',backdropFilter:'blur(16px)',borderTop:'1px solid rgba(255,255,255,0.06)',display:'flex',justifyContent:'space-around',padding:'10px 0 max(14px,env(safe-area-inset-bottom))',zIndex:100 },
+  item:{ display:'flex',flexDirection:'column',alignItems:'center',gap:'4px',padding:'4px 16px' },
+  lbl:{ fontSize:'10px',fontFamily:'var(--font-mono)',letterSpacing:'0.3px',transition:'color 0.2s' },
 }

@@ -31,7 +31,12 @@ export default function Execute() {
   const [pace, setPace]       = useState(null)
   const [gpsStatus, setGps]   = useState('waiting')
   const [mapReady, setMapReady] = useState(false)
-  const [shareScreen, setShareScreen] = useState(null) // {workout, snapshot} — shown at end
+  const [shareScreen, setShareScreen] = useState(null)
+  const [photoStart, setPhotoStart] = useState(null)
+  const [photoEnd,   setPhotoEnd]   = useState(null)
+  const [showPhotoPrompt, setShowPhotoPrompt] = useState(false) // 'start'|'end'|null
+  const photoInputRef = useRef(null)
+  const photoModeRef  = useRef(null) // {workout, snapshot} — shown at end
 
   // refs
   const ivRef      = useRef(null)
@@ -302,10 +307,11 @@ export default function Execute() {
       calories: stats.cal, avgPace: stats.pace,
       route: snapshot,
       coords: coordsRef.current.slice(0,500),
+      photoStart, photoEnd,
     }
     saveWorkout(workout)
     setShareScreen({ workout, snapshot })
-  }, [blocks, targetKm, buildShareCard])
+  }, [blocks, targetKm, buildShareCard, photoStart, photoEnd])
 
   const stop = useCallback(async () => {
     clearInterval(ivRef.current)
@@ -319,12 +325,28 @@ export default function Execute() {
       calories: stats.cal, avgPace: stats.pace,
       route: snapshot,
       coords: coordsRef.current.slice(0,500),
+      photoStart, photoEnd,
     }
     saveWorkout(workout)
     setShareScreen({ workout, snapshot })
-  }, [blocks, targetKm, computeStats, buildShareCard])
+  }, [blocks, targetKm, computeStats, buildShareCard, photoStart, photoEnd])
 
   const togglePause = () => { pausedRef.current=!pausedRef.current; setPaused(p=>!p) }
+
+  const triggerPhoto = (mode) => {
+    photoModeRef.current = mode
+    photoInputRef.current?.click()
+  }
+  const handlePhotoFile = (e) => {
+    const file = e.target.files?.[0]; if(!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      if(photoModeRef.current==='start') setPhotoStart(ev.target.result)
+      else setPhotoEnd(ev.target.result)
+    }
+    reader.readAsDataURL(file)
+    e.target.value = ''
+  }
 
   // ── Show share screen automatically when done ───────────────────────────
   if (shareScreen) {
@@ -457,6 +479,17 @@ export default function Execute() {
         </button>
         <button style={R.stopBtn} onClick={stop}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg> Encerrar
+        </button>
+      </div>
+
+      {/* Photo capture */}
+      <input ref={photoInputRef} type="file" accept="image/*" capture="environment" style={{display:'none'}} onChange={handlePhotoFile}/>
+      <div style={{display:'flex',gap:'8px',margin:'6px 14px 0'}}>
+        <button style={{flex:1,padding:'9px',borderRadius:10,background:photoStart?'rgba(181,242,61,0.15)':'rgba(255,255,255,0.04)',border:`1px solid ${photoStart?'rgba(181,242,61,0.3)':'rgba(255,255,255,0.08)'}`,color:photoStart?'var(--green)':'var(--text3)',fontSize:'12px',fontFamily:'var(--font-mono)',display:'flex',alignItems:'center',justifyContent:'center',gap:'6px'}} onClick={()=>triggerPhoto('start')}>
+          📷 {photoStart?'Início ✓':'Foto início'}
+        </button>
+        <button style={{flex:1,padding:'9px',borderRadius:10,background:photoEnd?'rgba(91,196,245,0.15)':'rgba(255,255,255,0.04)',border:`1px solid ${photoEnd?'rgba(91,196,245,0.3)':'rgba(255,255,255,0.08)'}`,color:photoEnd?'var(--blue)':'var(--text3)',fontSize:'12px',fontFamily:'var(--font-mono)',display:'flex',alignItems:'center',justifyContent:'center',gap:'6px'}} onClick={()=>triggerPhoto('end')}>
+          📷 {photoEnd?'Final ✓':'Foto final'}
         </button>
       </div>
 
