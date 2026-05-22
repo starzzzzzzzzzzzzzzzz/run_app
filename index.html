@@ -4,25 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>PaceUp</title>
-
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-
-    <!-- Leaflet CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
     <style>
-      .leaflet-control-attribution { display: none !important; }
-      .leaflet-control-zoom { display: none !important; }
+      .leaflet-control-attribution,.leaflet-control-zoom { display:none!important; }
+      .leaflet-container { background:#0d0d0d; }
     </style>
   </head>
   <body>
     <div id="root"></div>
-
-    <!-- Leaflet JS — must load before React bundle -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
