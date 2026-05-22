@@ -65,6 +65,15 @@ export const getHistory = () => {
   catch { return [] }
 }
 
+export const deleteWorkout = (id) => {
+  const history = getHistory().filter(w => w.id !== id)
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history))
+}
+
+export const clearHistory = () => {
+  localStorage.removeItem(HISTORY_KEY)
+}
+
 export const savePlan = (plan) =>
   localStorage.setItem(PLAN_KEY, JSON.stringify(plan))
 
